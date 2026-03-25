@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gynae Oncology MDM — Referral Form Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F6F5F2;
+    --surface: #FFFFFF;
+    --surface-alt: #F0EFEB;
+    --border: #DDD9D0;
+    --border-focus: #7B6F5E;
+    --text: #2C2824;
+    --text-muted: #7B7468;
+    --accent: #3D6B50;
+    --accent-hover: #2E5340;
+    --accent-light: #E8F0EB;
+    --error: #A23B3B;
+    --error-bg: #FDF0F0;
+    --success: #3D6B50;
+    --success-bg: #E8F0EB;
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(44,40,36,0.06);
+    --shadow-md: 0 4px 16px rgba(44,40,36,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  .app-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .app-header svg {
+    width: 36px; height: 36px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .app-header .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .container { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .panel-body { padding: 20px; }
+
+  textarea {
+    width: 100%;
+    min-height: 520px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--surface-alt);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--border-focus); }
+
+  textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+    justify-content: center;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--surface-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  .btn-secondary:hover { background: var(--border); }
+
+  .sidebar-section {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-section:last-child { border-bottom: none; }
+
+  .sidebar-section h3 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .field-grid {
+    display: grid;
+    gap: 4px;
+  }
+
+  .field-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .field-label {
+    font-weight: 500;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    min-width: 70px;
+  }
+
+  .field-value {
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .field-value.empty {
+    color: var(--error);
+    font-style: italic;
+    font-size: 11.5px;
+  }
+
+  .field-value.ok { color: var(--success); }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-badge.error { background: var(--error-bg); color: var(--error); }
+  .status-badge.success { background: var(--success-bg); color: var(--success); }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-badge.error .status-dot { background: var(--error); }
+  .status-badge.success .status-dot { background: var(--success); }
+
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .stat-box {
+    flex: 1;
+    text-align: center;
+    padding: 10px 8px;
+    background: var(--surface-alt);
+    border-radius: 8px;
+  }
+
+  .stat-number {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+
+  .radiology-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .rad-tab {
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 4px;
+    background: var(--surface-alt);
+    color: var(--text-muted);
+    border: none;
+    cursor: default;
+  }
+
+  .rad-tab.active { background: var(--accent-light); color: var(--accent); }
+  .rad-tab.empty { opacity: 0.4; }
+
+  .action-bar {
+    padding: 20px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    background: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: var(--error); }
+
+  .sample-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .sample-link:hover { text-decoration: underline; }
+
+  .instructions {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    padding: 16px 20px;
+  }
+  .instructions ol {
+    padding-left: 18px;
+  }
+  .instructions li {
+    margin-bottom: 6px;
+  }
+  .instructions code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--surface-alt);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="4" width="24" height="30" rx="3" stroke="currentColor" stroke-width="2" fill="none"/>
+    <path d="M8 12h12M8 17h12M8 22h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="20" y="2" width="14" height="14" rx="7" fill="currentColor"/>
+    <path d="M27 5.5v7M23.5 9h7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+  <div>
+    <h1>Gynae Oncology MDM Referral</h1>
+    <div class="subtitle">Paste Heidi output &rarr; download completed DOCX form</div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- LEFT: Input panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Heidi Template Output</h2>
+      <a class="sample-link" onclick="loadSample()">Load sample data</a>
+    </div>
+    <div class="panel-body">
+      <textarea id="heidiInput" placeholder="Paste the structured output from Heidi Health here...
+
+Example format:
+REFERRAL_DATE: 25/03/2026
+
+--- PATIENT DETAILS ---
+PATIENT_NAME: Jane Smith
+NHI_NUMBER: ABC1234
+DOB: 15/06/1965
+..."></textarea>
+    </div>
+  </div>
+
+  <!-- RIGHT: Preview + actions -->
+  <div>
+    <div class="panel" style="margin-bottom: 16px;">
+      <div class="panel-header">
+        <h2>Parsed Fields</h2>
+        <span class="status-badge" id="statusBadge">
+          <span class="status-dot"></span>
+          <span id="statusText">Waiting for input</span>
+        </span>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-number" id="filledCount">0</div>
+            <div class="stat-label">Filled</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="missingCount">0</div>
+            <div class="stat-label">Missing</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="radCount">0</div>
+            <div class="stat-label">Radiology</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section" id="patientPreview">
+        <h3>Patient</h3>
+        <div class="field-grid" id="patientFields"></div>
+      </div>
+
+      <div class="sidebar-section" id="referrerPreview">
+        <h3>Referrer</h3>
+        <div class="field-grid" id="referrerFields"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Radiology</h3>
+        <div class="radiology-tabs" id="radTabs"></div>
+        <div class="field-grid" id="radiologyFields"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>MDM Question</h3>
+        <div class="field-grid" id="mdmFields"></div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn btn-primary" id="generateBtn" disabled onclick="generateDocx()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v8m0 0l-3-3m3 3l3-3M4 14h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Generate DOCX
+        </button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="instructions">
+        <h3 style="font-size:13px; font-weight:600; margin-bottom:8px; color:var(--text);">How to use</h3>
+        <ol>
+          <li>Set up the Heidi template with the provided prompt</li>
+          <li>Run a consultation through Heidi</li>
+          <li>Copy the structured output and paste it here</li>
+          <li>Review parsed fields in the sidebar</li>
+          <li>Click <strong>Generate DOCX</strong> to download the completed referral form</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── Field definitions ───
+const CORE_FIELDS = [
+  'REFERRAL_DATE','PATIENT_NAME','NHI_NUMBER','DOB','ADDRESS','PHONE_MOBILE',
+  'CONSULTANT_NAME','HOSPITAL_DHB','EMAIL_ADDRESS','GP_NAME_AND_ADDRESS',
+  'HSCAN_TARGET_DATE','AGE','BRIEF_HISTORY','COMORBIDITIES','TUMOUR_MARKERS',
+  'BMI','ECOG_SCORE','ETHNICITY',
+  'OPERATION_DATE','OPERATION_SURGEON','OPERATION_PROCEDURE','OPERATION_FINDINGS',
+  'SPECIMEN_TYPE','HISTOLOGY_DATE','LAB_NAME','HISTOLOGY_FINDINGS',
+  'MDM_QUESTION','PATIENT_AWARE_OF_DIAGNOSIS','DATE_OF_DIAGNOSIS'
+];
+
+const RAD_FIELDS = ['TYPE','DATE','LOCATION','FINDINGS'];
+
+// ─── Parser ───
+function parseHeidi(text) {
+  const data = {};
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const match = line.match(/^([A-Z][A-Z0-9_]+)\s*:\s*(.+)$/);
+    if (match) {
+      data[match[1].trim()] = match[2].trim();
+    }
+  }
+  return data;
+}
+
+function countRadiology(data) {
+  let count = 0;
+  for (let i = 1; i <= 5; i++) {
+    if (data[`RADIOLOGY_${i}_TYPE`] && data[`RADIOLOGY_${i}_TYPE`] !== 'N/A' && data[`RADIOLOGY_${i}_TYPE`] !== 'Not documented') {
+      count++;
+    }
+  }
+  return count;
+}
+
+// ─── Preview updater ───
+function updatePreview() {
+  const text = document.getElementById('heidiInput').value;
+  const data = parseHeidi(text);
+
+  const fieldRow = (label, key) => {
+    const val = data[key];
+    const hasVal = val && val !== 'Not documented' && val !== 'N/A';
+    return `<div class="field-row"><span class="field-label">${label}</span><span class="field-value ${hasVal ? 'ok' : 'empty'}">${hasVal ? val : 'Missing'}</span></div>`;
+  };
+
+  document.getElementById('patientFields').innerHTML =
+    fieldRow('Name', 'PATIENT_NAME') +
+    fieldRow('NHI', 'NHI_NUMBER') +
+    fieldRow('DOB', 'DOB') +
+    fieldRow('Age', 'AGE') +
+    fieldRow('Ethnicity', 'ETHNICITY');
+
+  document.getElementById('referrerFields').innerHTML =
+    fieldRow('Consultant', 'CONSULTANT_NAME') +
+    fieldRow('Hospital', 'HOSPITAL_DHB') +
+    fieldRow('Email', 'EMAIL_ADDRESS');
+
+  // Radiology tabs
+  const radCount = countRadiology(data);
+  let tabsHtml = '';
+  for (let i = 1; i <= 5; i++) {
+    const has = data[`RADIOLOGY_${i}_TYPE`] && data[`RADIOLOGY_${i}_TYPE`] !== 'N/A' && data[`RADIOLOGY_${i}_TYPE`] !== 'Not documented';
+    tabsHtml += `<span class="rad-tab ${has ? 'active' : 'empty'}">${i}</span>`;
+  }
+  document.getElementById('radTabs').innerHTML = tabsHtml;
+
+  let radHtml = '';
+  for (let i = 1; i <= 5; i++) {
+    const t = data[`RADIOLOGY_${i}_TYPE`];
+    if (t && t !== 'N/A' && t !== 'Not documented') {
+      radHtml += `<div class="field-row"><span class="field-label">${t}</span><span class="field-value ok">${data[`RADIOLOGY_${i}_DATE`] || ''} — ${data[`RADIOLOGY_${i}_LOCATION`] || ''}</span></div>`;
+    }
+  }
+  if (!radHtml) radHtml = '<div class="field-row"><span class="field-value empty">No radiology entries</span></div>';
+  document.getElementById('radiologyFields').innerHTML = radHtml;
+
+  document.getElementById('mdmFields').innerHTML =
+    fieldRow('Question', 'MDM_QUESTION') +
+    fieldRow('Aware?', 'PATIENT_AWARE_OF_DIAGNOSIS') +
+    fieldRow('Dx Date', 'DATE_OF_DIAGNOSIS');
+
+  // Stats
+  let filled = 0, missing = 0;
+  for (const f of CORE_FIELDS) {
+    const v = data[f];
+    if (v && v !== 'Not documented') filled++; else missing++;
+  }
+  for (let i = 1; i <= radCount; i++) {
+    for (const rf of RAD_FIELDS) {
+      const v = data[`RADIOLOGY_${i}_${rf}`];
+      if (v && v !== 'Not documented' && v !== 'N/A') filled++; else missing++;
+    }
+  }
+
+  document.getElementById('filledCount').textContent = filled;
+  document.getElementById('missingCount').textContent = missing;
+  document.getElementById('radCount').textContent = radCount;
+
+  const badge = document.getElementById('statusBadge');
+  const statusText = document.getElementById('statusText');
+  const hasData = Object.keys(data).length > 0;
+  badge.className = 'status-badge ' + (hasData ? (missing === 0 ? 'success' : 'error') : '');
+  statusText.textContent = hasData ? (missing === 0 ? 'All fields filled' : `${missing} missing`) : 'Waiting for input';
+
+  document.getElementById('generateBtn').disabled = !hasData;
+}
+
+document.getElementById('heidiInput').addEventListener('input', updatePreview);
+
+// ─── Toast ───
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ─── DOCX Generation ───
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#x2019;');
+}
+
+function makeRun(text, opts = {}) {
+  let rpr = '<w:rPr>';
+  rpr += '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+  if (opts.bold) rpr += '<w:b/>';
+  rpr += `<w:sz w:val="${opts.size || 20}"/>`;
+  rpr += `<w:szCs w:val="${opts.size || 20}"/>`;
+  rpr += '</w:rPr>';
+  return `<w:r>${rpr}<w:t xml:space="preserve">${esc(text)}</w:t></w:r>`;
+}
+
+function makePara(runs, opts = {}) {
+  let ppr = '<w:pPr>';
+  if (opts.style) ppr += `<w:pStyle w:val="${opts.style}"/>`;
+  if (opts.spacing !== undefined) ppr += `<w:spacing w:after="${opts.spacing}" w:line="264" w:lineRule="auto"/>`;
+  else ppr += '<w:spacing w:after="40" w:line="264" w:lineRule="auto"/>';
+  if (opts.numId !== undefined) ppr += `<w:numPr><w:ilvl w:val="0"/><w:numId w:val="${opts.numId}"/></w:numPr>`;
+  ppr += '</w:pPr>';
+  return `<w:p>${ppr}${runs}</w:p>`;
+}
+
+function makeCell(content, width, opts = {}) {
+  let tcPr = `<w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>`;
+  if (opts.gridSpan) tcPr += `<w:gridSpan w:val="${opts.gridSpan}"/>`;
+  if (opts.shading) tcPr += `<w:shd w:val="clear" w:color="auto" w:fill="${opts.shading}"/>`;
+  tcPr += '<w:tcMar><w:top w:w="40" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar>';
+  tcPr += '</w:tcPr>';
+  return `<w:tc>${tcPr}${content}</w:tc>`;
+}
+
+function makeRow(cells) {
+  return `<w:tr><w:trPr><w:cantSplit/></w:trPr>${cells.join('')}</w:tr>`;
+}
+
+function makeTable(widths, rows, tableWidth) {
+  const tw = tableWidth || widths.reduce((a,b) => a+b, 0);
+  const grid = widths.map(w => `<w:gridCol w:w="${w}"/>`).join('');
+  return `<w:tbl><w:tblPr><w:tblW w:w="${tw}" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="0" w:noVBand="0"/></w:tblPr><w:tblGrid>${grid}</w:tblGrid>${rows.join('')}</w:tbl>`;
+}
+
+function makeLabelValue(label, value, opts = {}) {
+  const sz = opts.size || 20;
+  return makePara(
+    makeRun(label + ' ', { bold: true, size: sz }) +
+    makeRun(value || '', { size: sz }),
+    { numId: opts.numId, spacing: opts.spacing !== undefined ? opts.spacing : 40 }
+  );
+}
+
+function makeSectionHeader(text) {
+  return makePara(makeRun(text, { bold: true, size: 22 }), { spacing: 120 });
+}
+
+function generateDocx() {
+  const text = document.getElementById('heidiInput').value;
+  const d = parseHeidi(text);
+  if (Object.keys(d).length === 0) {
+    showToast('No data to generate', true);
+    return;
+  }
+
+  try {
+    // ─── Build document body ───
+    let body = '';
+
+    // Title box (single-cell bordered table)
+    const titleCell = makeCell(
+      makePara(makeRun('Gynaecology Oncology MDM Referral Form', { bold: true, size: 32 }), { spacing: 0 }),
+      9360, { shading: 'E8E8E8' }
+    );
+    body += `<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/><w:tblBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:left w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="auto"/><w:right w:val="single" w:sz="4" w:space="0" w:color="auto"/></w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="9360"/></w:tblGrid><w:tr>${titleCell}</w:tr></w:tbl>`;
+
+    // Address block
+    body += makePara(makeRun('National Women\u2019s Health', { bold: true, size: 20 }), { spacing: 20 });
+    body += makePara(makeRun('Private Bag 92 189, Auckland, New Zealand', { bold: true, size: 18 }), { spacing: 120 });
+
+    // ─── Patient demographics table ───
+    const colW = [1900, 2780, 1400, 3280];
+
+    const row1 = makeRow([
+      makeCell(makePara(makeRun('Date of Referral:', { bold: true, size: 20 })), colW[0]),
+      makeCell(makePara(makeRun(d.REFERRAL_DATE || '', { size: 20 })), colW[1]),
+      makeCell(makePara(makeRun('NHI Number:', { bold: true, size: 20 })), colW[2]),
+      makeCell(makePara(makeRun(d.NHI_NUMBER || '', { size: 20 })), colW[3]),
+    ]);
+
+    const row2 = makeRow([
+      makeCell(makePara(makeRun('Patient Name:', { bold: true, size: 20 })), colW[0]),
+      makeCell(makePara(makeRun(d.PATIENT_NAME || '', { size: 20 })), colW[1]),
+      makeCell(makePara(makeRun('DOB:', { bold: true, size: 20 })), colW[2]),
+      makeCell(makePara(makeRun(d.DOB || '', { size: 20 })), colW[3]),
+    ]);
+
+    const row3 = makeRow([
+      makeCell(makePara(makeRun('Address:', { bold: true, size: 20 })), colW[0]),
+      makeCell(makePara(makeRun(d.ADDRESS || '', { size: 20 })), colW[1] + colW[2] + colW[3], { gridSpan: 3 }),
+    ]);
+
+    const row4 = makeRow([
+      makeCell(makePara(makeRun('Phone/Mobile:', { bold: true, size: 20 })), colW[0]),
+      makeCell(makePara(makeRun(d.PHONE_MOBILE || '', { size: 20 })), colW[1] + colW[2] + colW[3], { gridSpan: 3 }),
+    ]);
+
+    body += makeTable(colW, [row1, row2, row3, row4]);
+    body += makePara('', { spacing: 80 });
+
+    // HSCAN target date
+    body += makeLabelValue('High Suspicion of Cancer Treatment Target Date:', d.HSCAN_TARGET_DATE || 'N/A', { size: 20, spacing: 80 });
+
+    // ─── Referring specialist ───
+    body += makeSectionHeader('REFERRING SPECIALIST');
+    body += makeLabelValue('Consultant name:', d.CONSULTANT_NAME, { numId: 1 });
+    body += makeLabelValue('Hospital/DHB:', d.HOSPITAL_DHB, { numId: 1 });
+    body += makeLabelValue('Email address:', d.EMAIL_ADDRESS, { numId: 1, spacing: 80 });
+
+    // GP
+    body += makeLabelValue('GP name and address:', d.GP_NAME_AND_ADDRESS, { size: 20, spacing: 80 });
+
+    // ─── History ───
+    body += makeSectionHeader('HISTORY');
+    body += makeLabelValue('Age:', d.AGE, { numId: 2 });
+    body += makeLabelValue('Brief history:', d.BRIEF_HISTORY, { numId: 2 });
+    body += makeLabelValue('Co-morbidities:', d.COMORBIDITIES, { numId: 2 });
+    body += makeLabelValue('Tumour markers (including RMI & required bloods):', d.TUMOUR_MARKERS, { numId: 2 });
+    body += makeLabelValue('BMI:', d.BMI, { numId: 2 });
+    body += makeLabelValue('ECOG score:', d.ECOG_SCORE, { numId: 2 });
+    body += makeLabelValue('Ethnicity:', d.ETHNICITY, { numId: 2, spacing: 80 });
+
+    // ─── Radiology (up to 5) ───
+    const radCount = countRadiology(d);
+    for (let i = 1; i <= (radCount || 1); i++) {
+      const hasData = d[`RADIOLOGY_${i}_TYPE`] && d[`RADIOLOGY_${i}_TYPE`] !== 'N/A' && d[`RADIOLOGY_${i}_TYPE`] !== 'Not documented';
+      if (!hasData && i > 1) continue;
+      body += makeSectionHeader(`RADIOLOGY${radCount > 1 ? ' ' + i : ''}`);
+      body += makeLabelValue('Type:', d[`RADIOLOGY_${i}_TYPE`] || '', { numId: 2 + i });
+      body += makeLabelValue('Date performed:', d[`RADIOLOGY_${i}_DATE`] || '', { numId: 2 + i });
+      body += makeLabelValue('Location performed:', d[`RADIOLOGY_${i}_LOCATION`] || '', { numId: 2 + i });
+      body += makeLabelValue('Key findings:', d[`RADIOLOGY_${i}_FINDINGS`] || '', { numId: 2 + i, spacing: 80 });
+    }
+
+    // ─── Operation ───
+    body += makeSectionHeader('OPERATION');
+    body += makeLabelValue('Date:', d.OPERATION_DATE, { numId: 8 });
+    body += makeLabelValue('Surgeon:', d.OPERATION_SURGEON, { numId: 8 });
+    body += makeLabelValue('Procedure:', d.OPERATION_PROCEDURE, { numId: 8 });
+    body += makeLabelValue('Findings:', d.OPERATION_FINDINGS, { numId: 8, spacing: 80 });
+
+    // ─── Histology ───
+    body += makeSectionHeader('HISTOLOGY/CYTOLOGY');
+    body += makeLabelValue('Specimen type:', d.SPECIMEN_TYPE, { numId: 9 });
+    body += makeLabelValue('Date:', d.HISTOLOGY_DATE, { numId: 9 });
+    body += makeLabelValue('Name of the lab:', d.LAB_NAME, { numId: 9 });
+    body += makeLabelValue('Key findings:', d.HISTOLOGY_FINDINGS, { numId: 9, spacing: 80 });
+
+    // ─── MDM question ───
+    body += makePara(
+      makeRun('What is the question for the MDM? ', { bold: true, size: 20 }) +
+      makeRun(d.MDM_QUESTION || '', { size: 20 }),
+      { spacing: 80 }
+    );
+
+    // ─── Patient awareness ───
+    body += makePara(
+      makeRun('Is the patient aware of the CANCER diagnosis? ', { bold: true, size: 20 }) +
+      makeRun(d.PATIENT_AWARE_OF_DIAGNOSIS || '', { size: 20 }),
+      { spacing: 80 }
+    );
+
+    // ─── Date of diagnosis ───
+    body += makePara(
+      makeRun('DATE OF DIAGNOSIS: ', { bold: true, size: 20 }) +
+      makeRun(d.DATE_OF_DIAGNOSIS || '', { size: 20 }),
+      { spacing: 120 }
+    );
+
+    // ─── Assemble full document XML ───
+    const numbering = buildNumbering(10);
+    const documentXml = buildDocumentXml(body);
+    const zip = new JSZip();
+
+    zip.file('[Content_Types].xml', contentTypesXml());
+    zip.file('_rels/.rels', relsXml());
+    const wordFolder = zip.folder('word');
+    wordFolder.file('document.xml', documentXml);
+    wordFolder.file('numbering.xml', numbering);
+    wordFolder.file('styles.xml', stylesXml());
+    wordFolder.file('settings.xml', settingsXml());
+    const wordRels = zip.folder('word/_rels');
+    wordRels.file('document.xml.rels', documentRelsXml());
+
+    zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+      .then(blob => {
+        const name = d.PATIENT_NAME
+          ? `MDM_Referral_${d.PATIENT_NAME.replace(/\s+/g, '_')}_${d.REFERRAL_DATE || 'undated'}.docx`
+          : 'MDM_Referral_Form.docx';
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('DOCX downloaded — ' + name);
+      });
+
+  } catch (e) {
+    showToast('Generation failed: ' + e.message, true);
+    console.error(e);
+  }
+}
+
+// ─── XML helpers ───
+function buildDocumentXml(bodyContent) {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+  <w:body>
+    ${bodyContent}
+    <w:sectPr>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1418" w:header="709" w:footer="709" w:gutter="0"/>
+      <w:cols w:space="708"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+}
+
+function buildNumbering(count) {
+  let abstractNums = '';
+  let nums = '';
+  for (let i = 1; i <= count; i++) {
+    abstractNums += `<w:abstractNum w:abstractNumId="${i}">
+      <w:lvl w:ilvl="0">
+        <w:start w:val="1"/>
+        <w:numFmt w:val="bullet"/>
+        <w:lvlText w:val="\u2022"/>
+        <w:lvlJc w:val="left"/>
+        <w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr>
+        <w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr>
+      </w:lvl>
+    </w:abstractNum>`;
+    nums += `<w:num w:numId="${i}"><w:abstractNumId w:val="${i}"/></w:num>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  ${abstractNums}${nums}
+</w:numbering>`;
+}
+
+function stylesXml() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault><w:rPr>
+      <w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>
+      <w:sz w:val="20"/><w:szCs w:val="20"/>
+      <w:lang w:val="en-NZ"/>
+    </w:rPr></w:rPrDefault>
+    <w:pPrDefault><w:pPr>
+      <w:spacing w:after="40" w:line="264" w:lineRule="auto"/>
+    </w:pPr></w:pPrDefault>
+  </w:docDefaults>
+  <w:style w:type="paragraph" w:default="1" w:styleId="Normal">
+    <w:name w:val="Normal"/>
+    <w:pPr><w:spacing w:after="40" w:line="264" w:lineRule="auto"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="20"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="ListParagraph">
+    <w:name w:val="List Paragraph"/>
+    <w:basedOn w:val="Normal"/>
+    <w:pPr><w:ind w:left="720"/></w:pPr>
+  </w:style>
+</w:styles>`;
+}
+
+function settingsXml() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:defaultTabStop w:val="720"/>
+  <w:compat><w:compatSetting w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word" w:val="15"/></w:compat>
+</w:settings>`;
+}
+
+function contentTypesXml() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
+</Types>`;
+}
+
+function relsXml() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+}
+
+function documentRelsXml() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+</Relationships>`;
+}
+
+// ─── Sample data ───
+function loadSample() {
+  document.getElementById('heidiInput').value = `REFERRAL_DATE: 25/03/2026
+
+--- PATIENT DETAILS ---
+PATIENT_NAME: Jane Margaret Smith
+NHI_NUMBER: ABC1234
+DOB: 15/06/1965
+ADDRESS: 42 Remuera Road, Remuera, Auckland 1050
+PHONE_MOBILE: 021 555 0199
+
+--- REFERRING SPECIALIST ---
+CONSULTANT_NAME: Dr Sarah Chen
+HOSPITAL_DHB: Ascot Hospital / Waitemata DHB
+EMAIL_ADDRESS: sarah.chen@ascothospital.co.nz
+
+--- GP DETAILS ---
+GP_NAME_AND_ADDRESS: Dr James Wilson, Remuera Medical Centre, 12 Market Road, Remuera, Auckland 1050
+
+--- HIGH SUSPICION OF CANCER ---
+HSCAN_TARGET_DATE: 08/04/2026
+
+--- CLINICAL HISTORY ---
+AGE: 60
+BRIEF_HISTORY: Presented with 3 months of postmenopausal bleeding. Transvaginal USS showed thickened endometrium at 14mm. Pipelle biopsy performed in clinic. On examination cervix appeared normal, uterus slightly bulky, no adnexal masses, no ascites.
+COMORBIDITIES: Type 2 diabetes (HbA1c 58), hypertension, BMI 34, previous cholecystectomy 2018
+TUMOUR_MARKERS: CA125: 28 U/mL (normal). FBC: Hb 118 g/L, otherwise normal. UEC: normal. LFT: normal. Albumin: 38 g/L.
+BMI: 34
+ECOG_SCORE: 1
+ETHNICITY: NZ European
+
+--- RADIOLOGY 1 ---
+RADIOLOGY_1_TYPE: Transvaginal USS
+RADIOLOGY_1_DATE: 01/03/2026
+RADIOLOGY_1_LOCATION: Ascot Radiology, Auckland
+RADIOLOGY_1_FINDINGS: Thickened endometrium at 14mm. No adnexal masses. Small amount of fluid in endometrial cavity. Uterus measures 9.2 x 5.1 x 4.8cm.
+
+--- RADIOLOGY 2 ---
+RADIOLOGY_2_TYPE: MRI Pelvis
+RADIOLOGY_2_DATE: 15/03/2026
+RADIOLOGY_2_LOCATION: Auckland Radiology Group, Greenlane
+RADIOLOGY_2_FINDINGS: Endometrial mass with possible deep myometrial invasion (>50%). No parametrial involvement. No pelvic lymphadenopathy. No suspicious adnexal lesion.
+
+--- RADIOLOGY 3 ---
+RADIOLOGY_3_TYPE: CXR
+RADIOLOGY_3_DATE: 16/03/2026
+RADIOLOGY_3_LOCATION: Ascot Hospital
+RADIOLOGY_3_FINDINGS: Clear lung fields, no pulmonary metastases. Normal cardiac silhouette.
+
+--- OPERATION ---
+OPERATION_DATE: N/A
+OPERATION_SURGEON: N/A
+OPERATION_PROCEDURE: N/A
+OPERATION_FINDINGS: N/A
+
+--- HISTOLOGY/CYTOLOGY ---
+SPECIMEN_TYPE: Pipelle biopsy
+HISTOLOGY_DATE: 05/03/2026
+LAB_NAME: Auckland Pathology, Greenlane
+HISTOLOGY_FINDINGS: Grade 2 endometrioid adenocarcinoma. No LVSI identified on biopsy specimen. ER/PR positive. p53 wild-type pattern. MMR proteins intact (MLH1, PMS2, MSH2, MSH6 all retained).
+
+--- MDM QUESTION ---
+MDM_QUESTION: Recommendation for surgical management — suitability for total laparoscopic hysterectomy and bilateral salpingo-oophorectomy with sentinel lymph node mapping versus full pelvic lymphadenectomy, given MRI findings suggestive of deep myometrial invasion.
+
+--- CANCER AWARENESS ---
+PATIENT_AWARE_OF_DIAGNOSIS: Yes — patient has been informed of the diagnosis of endometrial cancer and understands the referral is for MDM discussion regarding surgical planning.
+
+--- DATE OF DIAGNOSIS ---
+DATE_OF_DIAGNOSIS: 05/03/2026`;
+  updatePreview();
+}
+</script>
+</body>
+</html>
