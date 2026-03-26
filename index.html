@@ -702,14 +702,20 @@ function generateDocx() {
 
     // ─── Radiology (up to 5) ───
     const radCount = countRadiology(d);
-    for (let i = 1; i <= (radCount || 1); i++) {
+    body += makeSectionHeader('RADIOLOGY');
+    const radEntries = [];
+    for (let i = 1; i <= 5; i++) {
       const hasData = d[`RADIOLOGY_${i}_TYPE`] && d[`RADIOLOGY_${i}_TYPE`] !== 'N/A' && d[`RADIOLOGY_${i}_TYPE`] !== 'Not documented';
-      if (!hasData && i > 1) continue;
-      body += makeSectionHeader(`RADIOLOGY${radCount > 1 ? ' ' + i : ''}`);
-      body += makeLabelValue('Type:', d[`RADIOLOGY_${i}_TYPE`] || '', { numId: 2 + i });
-      body += makeLabelValue('Date performed:', d[`RADIOLOGY_${i}_DATE`] || '', { numId: 2 + i });
-      body += makeLabelValue('Location performed:', d[`RADIOLOGY_${i}_LOCATION`] || '', { numId: 2 + i });
-      body += makeLabelValue('Key findings:', d[`RADIOLOGY_${i}_FINDINGS`] || '', { numId: 2 + i, spacing: 80 });
+      if (hasData) radEntries.push(i);
+    }
+    if (radEntries.length === 0) radEntries.push(1);
+    const lastRad = radEntries[radEntries.length - 1];
+    for (const i of radEntries) {
+      const isLast = i === lastRad;
+      body += makeLabelValue('Type:', d[`RADIOLOGY_${i}_TYPE`] || '', { numId: 3 });
+      body += makeLabelValue('Date performed:', d[`RADIOLOGY_${i}_DATE`] || '', { numId: 3 });
+      body += makeLabelValue('Location performed:', d[`RADIOLOGY_${i}_LOCATION`] || '', { numId: 3 });
+      body += makeLabelValue('Key findings:', d[`RADIOLOGY_${i}_FINDINGS`] || '', { numId: 3, spacing: isLast ? 80 : 0 });
     }
 
     // ─── Operation ───

@@ -8,9 +8,9 @@ ADDRESS: [Patient's full address] (Only include if explicitly mentioned in the t
 PHONE_MOBILE: [Patient's phone or mobile number] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 
 --- REFERRING SPECIALIST ---
-CONSULTANT_NAME: [Name of referring specialist] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
-HOSPITAL_DHB: [Referring specialist's hospital or DHB] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
-EMAIL_ADDRESS: [Email address of referring specialist] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
+CONSULTANT_NAME: [My name]
+HOSPITAL_DHB: [My hospital]
+EMAIL_ADDRESS: [My email address]]
 
 --- GP DETAILS ---
 GP_NAME_AND_ADDRESS: [Patient's GP name and practice address] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
@@ -27,47 +27,42 @@ BMI: [BMI value] (Only include if explicitly mentioned in the transcript, contex
 ECOG_SCORE: [ECOG performance status 0-4] (If not explicitly stated in the transcript, contextual notes or clinical note, infer from the functional status description if clearly described. If unclear, state "Not documented".)
 ETHNICITY: [Patient's ethnicity] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 
---- RADIOLOGY 1 --- (Only include if a first imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies by clinical significance.)
+--- RADIOLOGY--- (Only include if a first imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies chronologically by date.)
 RADIOLOGY_1_TYPE: [Type of first imaging study, e.g., CT CAP, MRI pelvis, Pelvic USS, PET-CT, CXR] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 RADIOLOGY_1_DATE: [Date of first imaging study in DD/MM/YYYY format] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 RADIOLOGY_1_LOCATION: [Location where the first imaging study was performed] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
-RADIOLOGY_1_FINDINGS: [Key findings from the first imaging study report] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
-
---- RADIOLOGY 2 --- (Only include if a second imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies by clinical significance.)
+RADIOLOGY_1_FINDINGS: [Key findings from the first imaging study report] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented". Write in a single paragraph, not as bullet points.)
+(Only include if a second imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies chronologically by date.)
 RADIOLOGY_2_TYPE: [Type of second imaging study] (If discussed in the transcript, contextual notes or clinical note, provide the type. Otherwise, state "N/A".)
 RADIOLOGY_2_DATE: [Date of second imaging study in DD/MM/YYYY format] (If discussed in the transcript, contextual notes or clinical note, provide the date. Otherwise, state "N/A".)
 RADIOLOGY_2_LOCATION: [Location where the second imaging study was performed] (If discussed in the transcript, contextual notes or clinical note, provide the location. Otherwise, state "N/A".)
-RADIOLOGY_2_FINDINGS: [Key findings from the second imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A".)
-
---- RADIOLOGY 3 --- (Only include if a third imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies by clinical significance.)
+RADIOLOGY_2_FINDINGS: [Key findings from the second imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A". Write in a single paragraph, not as bullet points.)(Only include if a third imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies chronologically by date.)
 RADIOLOGY_3_TYPE: [Type of third imaging study] (If discussed in the transcript, contextual notes or clinical note, provide the type. Otherwise, state "N/A".)
 RADIOLOGY_3_DATE: [Date of third imaging study in DD/MM/YYYY format] (If discussed in the transcript, contextual notes or clinical note, provide the date. Otherwise, state "N/A".)
 RADIOLOGY_3_LOCATION: [Location where the third imaging study was performed] (If discussed in the transcript, contextual notes or clinical note, provide the location. Otherwise, state "N/A".)
-RADIOLOGY_3_FINDINGS: [Key findings from the third imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A".)
-
---- RADIOLOGY 4 --- (Only include if a fourth imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies by clinical significance.)
+RADIOLOGY_3_FINDINGS: [Key findings from the third imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A". Write in a single paragraph, not as bullet points.)
+(Only include if a fourth imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies chronologically by date.)
 RADIOLOGY_4_TYPE: [Type of fourth imaging study] (If discussed in the transcript, contextual notes or clinical note, provide the type. Otherwise, state "N/A".)
 RADIOLOGY_4_DATE: [Date of fourth imaging study in DD/MM/YYYY format] (If discussed in the transcript, contextual notes or clinical note, provide the date. Otherwise, state "N/A".)
 RADIOLOGY_4_LOCATION: [Location where the fourth imaging study was performed] (If discussed in the transcript, contextual notes or clinical note, provide the location. Otherwise, state "N/A".)
-RADIOLOGY_4_FINDINGS: [Key findings from the fourth imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A".)
-
---- RADIOLOGY 5 --- (Only include if a fifth imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies by clinical significance.)
+RADIOLOGY_4_FINDINGS: [Key findings from the fourth imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A". Write in a single paragraph, not as bullet points.)
+(Only include if a fifth imaging study is discussed in the transcript, contextual notes or clinical note; otherwise omit section entirely. Order studies chronologically by date.)
 RADIOLOGY_5_TYPE: [Type of fifth imaging study] (If discussed in the transcript, contextual notes or clinical note, provide the type. Otherwise, state "N/A".)
 RADIOLOGY_5_DATE: [Date of fifth imaging study in DD/MM/YYYY format] (If discussed in the transcript, contextual notes or clinical note, provide the date. Otherwise, state "N/A".)
 RADIOLOGY_5_LOCATION: [Location where the fifth imaging study was performed] (If discussed in the transcript, contextual notes or clinical note, provide the location. Otherwise, state "N/A".)
-RADIOLOGY_5_FINDINGS: [Key findings from the fifth imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A".)
+RADIOLOGY_5_FINDINGS: [Key findings from the fifth imaging study report] (If discussed in the transcript, contextual notes or clinical note, provide the key findings. Otherwise, state "N/A". Write in a single paragraph, not as bullet points.)
 
 --- OPERATION ---
 OPERATION_DATE: [Date of operation in DD/MM/YYYY format] (If surgery was performed as per the transcript, contextual notes or clinical note, provide the date. Otherwise, state "N/A".)
 OPERATION_SURGEON: [Name of surgeon] (If surgery was performed as per the transcript, contextual notes or clinical note, provide the surgeon's name. Otherwise, state "N/A".)
 OPERATION_PROCEDURE: [Name of surgical procedure] (If surgery was performed as per the transcript, contextual notes or clinical note, provide the procedure name. Otherwise, state "N/A".)
-OPERATION_FINDINGS: [Operative findings] (If surgery was performed as per the transcript, contextual notes or clinical note, provide the operative findings. Otherwise, state "N/A".)
+OPERATION_FINDINGS: [Operative findings] (If surgery was performed as per the transcript, contextual notes or clinical note, provide the operative findings. Write in a single paragraph of full sentences. Otherwise, state "N/A".)
 
 --- HISTOLOGY/CYTOLOGY ---
 SPECIMEN_TYPE: [Type of specimen, e.g., pipelle, cervical biopsy, curettings, omental biopsy] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 HISTOLOGY_DATE: [Date of histology/cytology in DD/MM/YYYY format] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 LAB_NAME: [Name of the laboratory] (Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
-HISTOLOGY_FINDINGS: [Key histological/cytological findings including tumour type, grade, LVSI, depth of invasion, and other special features] (Include tumour type, grade, FIGO stage, LVSI, depth of myometrial invasion, margin status, and any immunohistochemistry results if discussed. Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
+HISTOLOGY_FINDINGS: [Key histological/cytological findings including tumour type, grade, LVSI, depth of invasion, and other special features] (Include tumour type, grade, FIGO stage, LVSI, depth of myometrial invasion, margin status, and any immunohistochemistry results if discussed. Write in a single paragraph of full sentences. Only include if explicitly mentioned in the transcript, contextual notes or clinical note; otherwise state "Not documented".)
 
 --- MDM QUESTION ---
 MDM_QUESTION: [The specific clinical question for the MDM] (Formulate a clear, specific clinical question based on the clinician's intent apparent in the transcript, contextual notes or clinical note. If no question is apparent, state "Not documented".)
